@@ -1,0 +1,159 @@
+
+import java.util.Scanner;
+import java.util.Locale;
+
+public class SocialMediaAnalyzer {
+
+    // VIBE FEST visitor post
+    static String text =
+        "The GAMING zone was amazing! I came for the MUSIC " +
+        "but honestly the GAMING tournament was my favourite. " +
+        "The FOOD was good too. Please bring more GAMING " +
+        "competitions next year. The AI booth was also interesting.";
+
+    // Naive String Matching
+    static void naiveSearch(String text, String pattern) {
+
+        int n = text.length();
+        int m = pattern.length();
+
+        int count = 0;
+        long comparisons = 0;
+
+        System.out.println("\nNAIVE STRING MATCHING");
+        System.out.println("---------------------");
+
+        for (int i = 0; i <= n - m; i++) {
+
+            int j = 0;
+
+            while (j < m) {
+                comparisons++;
+
+                if (text.charAt(i + j) != pattern.charAt(j)) {
+                    break;
+                }
+
+                j++;
+            }
+
+            if (j == m) {
+                System.out.println("Match at index: " + i);
+                count++;
+            }
+        }
+
+        System.out.println("Total occurrences: " + count);
+        System.out.println("Character comparisons: " + comparisons);
+    }
+
+    // Rabin-Karp Algorithm
+    static void rabinKarp(String text, String pattern) {
+
+        int n = text.length();
+        int m = pattern.length();
+
+        int d = 256;
+        int q = 101;
+
+        int h = 1;
+        int patternHash = 0;
+        int textHash = 0;
+
+        int count = 0;
+        long comparisons = 0;
+
+        System.out.println("\nRABIN-KARP");
+        System.out.println("----------");
+
+        if (m > n) {
+            System.out.println("Total occurrences: 0");
+            System.out.println("Character comparisons: 0");
+            return;
+        }
+
+        // Calculate h = d^(m-1) mod q
+        for (int i = 0; i < m - 1; i++) {
+            h = (h * d) % q;
+        }
+
+        // Calculate initial hashes
+        for (int i = 0; i < m; i++) {
+            patternHash =
+                (d * patternHash + pattern.charAt(i)) % q;
+
+            textHash =
+                (d * textHash + text.charAt(i)) % q;
+        }
+
+        // Search all possible windows
+        for (int i = 0; i <= n - m; i++) {
+
+            if (patternHash == textHash) {
+
+                int j = 0;
+
+                // Verify possible match
+                while (j < m) {
+                    comparisons++;
+
+                    if (text.charAt(i + j) != pattern.charAt(j)) {
+                        break;
+                    }
+
+                    j++;
+                }
+
+                if (j == m) {
+                    System.out.println("Match at index: " + i);
+                    count++;
+                }
+            }
+
+            // Update rolling hash
+            if (i < n - m) {
+                textHash =
+                    (d * (textHash - text.charAt(i) * h)
+                    + text.charAt(i + m)) % q;
+
+                if (textHash < 0) {
+                    textHash += q;
+                }
+            }
+        }
+
+        System.out.println("Total occurrences: " + count);
+        System.out.println("Character comparisons: " + comparisons);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("VIBE FEST TREND SCANNER");
+        System.out.println("=======================");
+
+        System.out.println("\nVisitor Post:");
+        System.out.println(text);
+
+        System.out.print("\nEnter keyword: ");
+
+        String keyword = input.nextLine().trim()
+            .toUpperCase(Locale.ROOT);
+
+        if (keyword.isEmpty()) {
+            System.out.println("Please enter a valid keyword.");
+            input.close();
+            return;
+        }
+
+        // Normalize for case-insensitive search
+        String searchText = text.toUpperCase(Locale.ROOT);
+
+        // Apply both algorithms to the same text and keyword
+        naiveSearch(searchText, keyword);
+        rabinKarp(searchText, keyword);
+
+        input.close();
+    }
+}
