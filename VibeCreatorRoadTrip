@@ -1,0 +1,141 @@
+public class VibeCreatorRoadTrip {
+
+    static final int N = 5;
+
+    static String[] places = {
+        "VIBE HQ",
+        "Campus A",
+        "Campus B",
+        "Campus C",
+        "Campus D"
+    };
+
+    static int[][] distance = {
+        { 0, 10, 15, 20, 18 },
+        { 10, 0, 12, 15, 14 },
+        { 15, 12, 0, 10, 13 },
+        { 20, 15, 10, 0, 8 },
+        { 18, 14, 13, 8, 0 }
+    };
+
+    static boolean[] visited = new boolean[N];
+    static int[] tour = new int[N + 1];
+
+    static int findTour() {
+
+        int current = 0;
+        int totalCost = 0;
+
+        visited[current] = true;
+        tour[0] = current;
+
+        System.out.println("\nROUTE GENERATION");
+        System.out.println("----------------");
+
+        System.out.println(
+            "Starting location: " + places[current]
+        );
+
+        for (int step = 1; step < N; step++) {
+
+            int nearest = -1;
+            int minDistance = Integer.MAX_VALUE;
+
+            for (int j = 0; j < N; j++) {
+
+                if (!visited[j] &&
+                    distance[current][j] < minDistance) {
+
+                    minDistance = distance[current][j];
+                    nearest = j;
+                }
+            }
+
+            visited[nearest] = true;
+
+            totalCost += minDistance;
+
+            current = nearest;
+            tour[step] = current;
+
+            System.out.println(
+                "Selected: " + places[current]
+                + " | Distance: " + minDistance
+                + " km | Total: " + totalCost + " km"
+            );
+        }
+
+        int returnCost = distance[current][0];
+        totalCost += returnCost;
+        tour[N] = 0;
+
+        System.out.println(
+            "Return to VIBE HQ: "
+            + returnCost + " km"
+        );
+
+        return totalCost;
+    }
+
+    static void displayTour(int totalCost) {
+
+        System.out.println("\nFINAL CREATOR TOUR");
+        System.out.println("------------------");
+
+        for (int i = 0; i <= N; i++) {
+
+            System.out.print(places[tour[i]]);
+
+            if (i < N) {
+                System.out.print(" -> ");
+            }
+        }
+
+        System.out.println();
+
+        System.out.println(
+            "Total travel cost: " + totalCost + " km"
+        );
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(
+            "VIBE CREATOR ROAD TRIP"
+        );
+
+        System.out.println(
+            "======================"
+        );
+
+        int totalCost = findTour();
+
+        displayTour(totalCost);
+
+        System.out.println(
+            "\nAll campuses visited exactly once."
+        );
+
+        System.out.println(
+            "Successfully returned to VIBE HQ."
+        );
+
+        System.out.println(
+            "Method: Nearest Neighbour Approximation"
+        );
+
+        System.out.println(
+            "Cost limit: 60 km"
+        );
+
+        if (totalCost <= 60) {
+            System.out.println(
+                "Result: Tour satisfies the 60 km limit."
+            );
+        } else {
+            System.out.println(
+                "Result: Tour exceeds the 60 km limit."
+            );
+        }
+    }
+}
